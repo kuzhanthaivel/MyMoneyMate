@@ -15,8 +15,8 @@ module.exports = {
         customPurpleDark: '#C79AE3',      // For 'IV Year' background
       },
       fontFamily: {
-        sans: ['Helvetica', 'Arial', 'sans-serif'],
-      }
+        ravi: ["RaviPrakash_400Regular", "sans-serif"],
+      },
     },
   },
   plugins: [],
