@@ -11,7 +11,7 @@ export default function Welcome() {
     switch (gestureName) {
       case 'SWIPE_UP':
         console.log('Up swipe performed');
-        navigation.navigate('Home');
+        navigation.navigate('Verifykey');
         break;
       default:
         console.log('Undetected action');

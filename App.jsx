@@ -7,6 +7,13 @@ import { useFonts, RaviPrakash_400Regular } from '@expo-google-fonts/ravi-prakas
 
 import HomeScreen from './screens/HomeScreen';
 import Welcome from './screens/Welcome';
+import Verifykey from './screens/Verifykey';
+import Addselection from './screens/Addselection';
+import AddNewmember from './screens/AddNewmember';
+import AddExistingmember from './/screens/AddExistingmember';
+import Viewbydate from './screens/Viewbydate';
+import ViewByIndividual from './screens/ViewbyName';
+import EditProfile from './screens/EditProfile';
 
 const Stack = createStackNavigator();
 
@@ -32,11 +39,17 @@ const App = () => {
       <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Welcome" component={Welcome} />
+        <Stack.Screen name="Verifykey" component={Verifykey}/>
+        <Stack.Screen name="Addselection" component={Addselection}/>
+        <Stack.Screen name="AddNewmember" component={AddNewmember}/>
+        <Stack.Screen name="AddExistingmember" component={AddExistingmember}/>
+        <Stack.Screen name="Viewbydate" component={Viewbydate}/>
+        <Stack.Screen name="ViewbyName" component={ViewByIndividual}/>
+        <Stack.Screen name="EditProfile" component={EditProfile}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-// Register the main component using the name from app.json
 AppRegistry.registerComponent('MyMoneyMate', () => App);
 export default App;
