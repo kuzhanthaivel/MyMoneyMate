@@ -5,13 +5,11 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  ScrollView,
   ImageBackground,
   Image,
   ActivityIndicator,
 } from "react-native";
 import CustomText from "../components/CustomText"; // Assuming CustomText is defined elsewhere
-import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 
 export default function ViewByIndividual() {
@@ -23,11 +21,9 @@ export default function ViewByIndividual() {
     setExpandedCard(expandedCard === id ? null : id);
   };
 
-  // Fetching data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Replace the URL with your actual API endpoint
         const response = await axios.get(
           "https://my-money-mate-server.vercel.app/get-all-transactions"
         );
@@ -46,7 +42,7 @@ export default function ViewByIndividual() {
     <View className="flex-1 p-3 mb-6 bg-white shadow-md rounded-xl">
       {/* Header */}
       <TouchableOpacity
-        className="flex-row items-center "
+        className="flex-row items-center"
         onPress={() => toggleCard(item.id)}
       >
         <Image
@@ -54,8 +50,8 @@ export default function ViewByIndividual() {
           className="pl-2 mr-4 rounded-full w-14 h-14"
         />
 
-        <View className="">
-          <CustomText className="text-2xl ">{item.name}</CustomText>
+        <View>
+          <CustomText className="text-2xl">{item.name}</CustomText>
           <View className="bg-[#87B2D3] flex-row gap-x-2 rounded-xl items-center justify-center">
             <Image
               className="w-3 h-3"
@@ -69,7 +65,6 @@ export default function ViewByIndividual() {
 
         <View className="absolute right-2">
           <Image
-            className=""
             source={
               expandedCard === item.id
                 ? require("../assets/appIMG/arrowUp.png")
@@ -102,13 +97,11 @@ export default function ViewByIndividual() {
           )}
 
           <View className="flex-row items-center justify-center h-12 px-4 mx-3 mt-3 text-2xl bg-white rounded-lg shadow-md">
-            {" "}
             <CustomText className="text-xl">
               Paid : {item.paidAmount}
             </CustomText>
           </View>
           <View className="flex-row items-center justify-center h-12 px-4 mx-3 mt-3 bg-white rounded-lg shadow-md">
-            {" "}
             <CustomText className="text-xl">
               Balance : {item.balance}
             </CustomText>
@@ -130,26 +123,22 @@ export default function ViewByIndividual() {
           backgroundColor="transparent"
         />
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-        >
-          <CustomText className="p-1 mt-10 mb-4 text-4xl">
-            View by Individual
-          </CustomText>
-
-          {/* Display Loading Spinner while data is loading */}
-          {loading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
-          ) : (
-            <FlatList
-              className="pt-4"
-              data={data} // Use the fetched data
-              renderItem={renderItem}
-              keyExtractor={(item) => item._id}
-            />
-          )}
-        </ScrollView>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            className="pt-4"
+            data={data} // Use the fetched data
+            renderItem={renderItem}
+            keyExtractor={(item) => item._id}
+            ListHeaderComponent={
+              <CustomText className="p-1 mt-10 mb-4 text-4xl">
+                View by Individual
+              </CustomText>
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </ImageBackground>
     </View>
   );

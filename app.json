@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/appIMG/splash.png",
+      "image": "./assets/icon.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -16,8 +16,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/appIMG/splash.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#87B1D3"
       },
       "package": "com.kuzhanthaivelu.MyMoneyMate"
     },
