@@ -1,40 +1,79 @@
-import React, { useState } from 'react';
-import { View, Image, ImageBackground, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import CustomText from '../components/CustomText';
-import { useNavigation } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useState } from "react";
+import {
+  View,
+  StatusBar,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Alert,
+} from "react-native";
+import CustomText from "../components/CustomText";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 export default function AddSelection() {
-    const navigation = useNavigation();
-  const [date, setDate] = useState(new Date());
-  const [formattedDate, setFormattedDate] = useState(""); 
-  const [showPicker, setShowPicker] = useState(false);
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { username } = route.params || {};
 
   const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
 
-  const formatDate = (date) => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
+  // Function to handle adding the new member
+  const handleAddMember = async () => {
+    if (!name || !targetAmount) {
+      Alert.alert("Error", "Name and Target Amount are required");
+      return;
+    }
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowPicker(false); 
-    setDate(currentDate); 
-    setFormattedDate(formatDate(currentDate)); 
+    try {
+      const response = await fetch(
+        "https://my-money-mate-server.vercel.app/create-member",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            targetAmount,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Show success message
+        Alert.alert("Success", "Member created successfully");
+        navigation.navigate("Home", { username: username });
+      } else {
+        // Show error message
+        Alert.alert("Error", data.error || "Failed to create member");
+      }
+    } catch (error) {
+      console.error("Error creating member:", error);
+      Alert.alert("Error", "An error occurred while creating the member");
+    }
   };
 
   return (
     <View className="flex-1">
       <ImageBackground
-        source={require('../assets/appIMG/addnewmemberBG.png')}
+        source={require("../assets/appIMG/addnewmemberBG.png")}
         className="flex-1 px-5 pt-16"
       >
-        <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
+        <StatusBar
+          barStyle="dark-content"
+          translucent={true}
+          backgroundColor="transparent"
+        />
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
           <View className="pt-8">
             <CustomText className="p-1 text-4xl">New member</CustomText>
           </View>
@@ -48,38 +87,6 @@ export default function AddSelection() {
             value={name}
             onChangeText={(text) => setName(text)}
           />
-
-          <View className="pt-8">
-            <CustomText className="p-1 text-2xl">Date</CustomText>
-          </View>
-          <TouchableOpacity
-            className="flex items-center justify-center h-12 p-4 mx-3 mt-4 bg-white rounded-lg drop-shadow-2xl"
-            onPress={() => setShowPicker(true)}
-          >
-            <CustomText className="text-lg text-gray-800">
-              {formattedDate || "Select a date"} 
-            </CustomText>
-          </TouchableOpacity>
-          {showPicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onChange}
-            />
-          )}
-
-          <View className="pt-8">
-            <CustomText className="p-1 text-2xl">Amount</CustomText>
-          </View>
-          <TextInput
-            className="h-12 mx-3 mt-4 text-lg bg-white rounded-lg drop-shadow-2xl"
-            placeholder="Enter amount"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={(text) => setAmount(text)}
-          />
-
           <View className="pt-8">
             <CustomText className="p-1 text-2xl">Target Amount</CustomText>
           </View>
@@ -91,8 +98,11 @@ export default function AddSelection() {
             onChangeText={(text) => setTargetAmount(text)}
           />
 
-          <TouchableOpacity className="items-center pt-10 pb-4" onPress={() => navigation.navigate('Home')}>
-            <Image source={require('../assets/appIMG/addButton.png')} />
+          <TouchableOpacity
+            className="items-center pt-10 pb-4"
+            onPress={handleAddMember}
+          >
+            <Image source={require("../assets/appIMG/addButton.png")} />
           </TouchableOpacity>
         </ScrollView>
       </ImageBackground>

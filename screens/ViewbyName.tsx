@@ -1,81 +1,118 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ScrollView, ImageBackground, Image } from "react-native";
-import CustomText from '../components/CustomText';  // Assuming CustomText is defined elsewhere
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StatusBar,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  ImageBackground,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import CustomText from "../components/CustomText"; // Assuming CustomText is defined elsewhere
+import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from "axios";
 
 export default function ViewByIndividual() {
-      const navigation = useNavigation();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [expandedCard, setExpandedCard] = useState(null);
 
   const toggleCard = (id) => {
     setExpandedCard(expandedCard === id ? null : id);
   };
 
-  const data = [
-    {
-      id: "1",
-      name: "Name 1",
-      balance: "500",
-      transactions: [
-        { date: "27/11/24", amount: "400" },
-        { date: "28/11/24", amount: "400" },
-        { date: "29/11/24", amount: "500" },
-        { date: "30/11/24", amount: "400" },
-      ],
-    },
-    { id: "2", name: "Name 2", balance: "500", transactions: [] },
-    { id: "3", name: "Name 3", balance: "500", transactions: [] },
-    { id: "4", name: "Name 4", balance: "500", transactions: [] },
-    { id: "5", name: "Name 5", balance: "500", transactions: [] },
-  ];
+  // Fetching data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Replace the URL with your actual API endpoint
+        const response = await axios.get(
+          "https://my-money-mate-server.vercel.app/get-all-transactions"
+        );
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const renderItem = ({ item }) => (
-    <View className="p-3 mb-6 bg-white shadow-md rounded-xl">
+    <View className="flex-1 p-3 mb-6 bg-white shadow-md rounded-xl">
       {/* Header */}
       <TouchableOpacity
         className="flex-row items-center "
         onPress={() => toggleCard(item.id)}
       >
         <Image
-          source={require('../assets/appIMG/profile1.png')}
+          source={require("../assets/appIMG/profile1.png")}
           className="pl-2 mr-4 rounded-full w-14 h-14"
         />
 
-        <View className="mx-3 ml-10">
+        <View className="">
           <CustomText className="text-2xl ">{item.name}</CustomText>
           <View className="bg-[#87B2D3] flex-row gap-x-2 rounded-xl items-center justify-center">
-            <Image className='w-3 h-3' source={require('../assets/appIMG/Rupee.png')} />
+            <Image
+              className="w-3 h-3"
+              source={require("../assets/appIMG/Rupee.png")}
+            />
             <CustomText className="pt-1 pr-2 text-lg">
-              {item.balance}
+              {item.targetAmount}
             </CustomText>
           </View>
         </View>
 
-        <View className="items-center left-24">
+        <View className="absolute right-2">
           <Image
-            className=''
-            source={expandedCard === item.id ? require('../assets/appIMG/arrowUp.png') : require('../assets/appIMG/arrowDown.png')}
+            className=""
+            source={
+              expandedCard === item.id
+                ? require("../assets/appIMG/arrowUp.png")
+                : require("../assets/appIMG/arrowDown.png")
+            }
           />
         </View>
       </TouchableOpacity>
 
       {expandedCard === item.id && (
         <View className="p-2 mt-3 bg-[#D6E5F0] rounded-lg">
-          <CustomText className="mb-2 text-lg font-semibold">Transactions</CustomText>
+          <CustomText className="mb-2 text-lg font-semibold">
+            Transactions
+          </CustomText>
           {item.transactions.length > 0 ? (
             item.transactions.map((tx, index) => (
               <View
                 key={index}
                 className="flex-row justify-between py-1 border-b border-gray-300"
               >
-                <CustomText className='text-xl'>{index + 1}</CustomText>
-                <CustomText className='text-xl'>{tx.date}</CustomText>
-                <CustomText className='text-xl'>{tx.amount}</CustomText>
+                <CustomText className="text-xl">{index + 1}</CustomText>
+                <CustomText className="text-xl">{tx.date}</CustomText>
+                <CustomText className="text-xl">{tx.amount}</CustomText>
               </View>
             ))
           ) : (
-            <CustomText className="text-xl text-center text-gray-600">No Transactions</CustomText>
+            <CustomText className="text-xl text-center text-gray-600">
+              No Transactions
+            </CustomText>
           )}
+
+          <View className="flex-row items-center justify-center h-12 px-4 mx-3 mt-3 text-2xl bg-white rounded-lg shadow-md">
+            {" "}
+            <CustomText className="text-xl">
+              Paid : {item.paidAmount}
+            </CustomText>
+          </View>
+          <View className="flex-row items-center justify-center h-12 px-4 mx-3 mt-3 bg-white rounded-lg shadow-md">
+            {" "}
+            <CustomText className="text-xl">
+              Balance : {item.balance}
+            </CustomText>
+          </View>
         </View>
       )}
     </View>
@@ -83,19 +120,35 @@ export default function ViewByIndividual() {
 
   return (
     <View className="flex-1">
-      <ImageBackground 
+      <ImageBackground
         source={require("../assets/appIMG/viewbydateBG.png")}
         className="flex-1 p-5 pt-14"
       >
-        <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
+        <StatusBar
+          barStyle="dark-content"
+          translucent={true}
+          backgroundColor="transparent"
+        />
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
           <CustomText className="p-1 mt-10 mb-4 text-4xl">
             View by Individual
           </CustomText>
-          <FlatList className='pt-4'
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-          />
+
+          {/* Display Loading Spinner while data is loading */}
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <FlatList
+              className="pt-4"
+              data={data} // Use the fetched data
+              renderItem={renderItem}
+              keyExtractor={(item) => item._id}
+            />
+          )}
         </ScrollView>
       </ImageBackground>
     </View>

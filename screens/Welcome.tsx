@@ -1,7 +1,14 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Image, ImageBackground, TouchableOpacity, Animated } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import GestureRecognizer from 'react-native-swipe-gestures';
+import React, { useEffect, useRef } from "react";
+import {
+  View,
+  StatusBar,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import GestureRecognizer from "react-native-swipe-gestures";
 
 export default function Welcome() {
   const jumpAnim = useRef(new Animated.Value(0)).current;
@@ -9,12 +16,12 @@ export default function Welcome() {
 
   const onSwipe = (gestureName) => {
     switch (gestureName) {
-      case 'SWIPE_UP':
-        console.log('Up swipe performed');
-        navigation.navigate('Verifykey');
+      case "SWIPE_UP":
+        console.log("Up swipe performed");
+        navigation.navigate("Verifykey");
         break;
       default:
-        console.log('Undetected action');
+        console.log("Undetected action");
     }
   };
 
@@ -41,16 +48,22 @@ export default function Welcome() {
       className="flex-1"
     >
       <ImageBackground
-        source={require('../assets/appIMG/WelcomeBG.png')}
+        source={require("../assets/appIMG/WelcomeBG.png")}
         className="flex-1"
       >
+        <StatusBar
+          barStyle="dark-content"
+          translucent={true}
+          backgroundColor="transparent"
+        />
+
         <View className="absolute items-center bottom-8 right-48 left-48">
           <Animated.View
             style={{ transform: [{ translateY: jumpAnim }] }}
             className="items-center justify-center"
           >
             <TouchableOpacity className="items-center justify-center">
-              <Image source={require('../assets/appIMG/swipe_up.png')} />
+              <Image source={require("../assets/appIMG/swipe_up.png")} />
             </TouchableOpacity>
           </Animated.View>
         </View>
