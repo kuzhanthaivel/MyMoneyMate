@@ -5,7 +5,6 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
-  ScrollView,
   FlatList,
   Text,
 } from "react-native";
@@ -108,21 +107,20 @@ export default function Viewbydate() {
           backgroundColor="transparent"
         />
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-        >
-          <View className="pt-5">
-            <CustomText className="p-2 text-3xl">View by Date</CustomText>
-          </View>
+        <CustomText className="p-2 pt-5 text-3xl">View by Date</CustomText>
 
-          <FlatList
-            className="pt-8"
-            data={transactions}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-          />
-        </ScrollView>
+        <FlatList
+          className="pt-8"
+          data={transactions}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => (
+            <CustomText className="pt-8 text-center text-gray-600">
+              No transactions found.
+            </CustomText>
+          )}
+        />
       </ImageBackground>
     </View>
   );

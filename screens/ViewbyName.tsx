@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   StatusBar,
-  Text,
   FlatList,
   TouchableOpacity,
   ImageBackground,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
-import CustomText from "../components/CustomText"; // Assuming CustomText is defined elsewhere
+import CustomText from "../components/CustomText";
 import axios from "axios";
 
 export default function ViewByIndividual() {
@@ -30,6 +30,7 @@ export default function ViewByIndividual() {
         setData(response.data);
       } catch (error) {
         console.error(error);
+        alert("Failed to fetch transactions. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -38,18 +39,51 @@ export default function ViewByIndividual() {
     fetchData();
   }, []);
 
+  const handleDelete = async (id) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this member?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await axios.post(
+                "https://my-money-mate-server.vercel.app/api/member/delete",
+                { id }
+              );
+              if (response.status === 200) {
+                Alert.alert("Member deleted successfully");
+                setData(data.filter((item) => item.id !== id));
+              } else {
+                Alert.alert(response.data.message || "Error deleting member");
+              }
+            } catch (error) {
+              console.error(error);
+              alert("Failed to delete member. Please try again later.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const renderItem = ({ item }) => (
-    <View className="flex-1 p-3 mb-6 bg-white shadow-md rounded-xl">
-      {/* Header */}
-      <TouchableOpacity
-        className="flex-row items-center"
-        onPress={() => toggleCard(item.id)}
-      >
+    <View
+      className={`flex-1 p-3 mb-6 bg-white shadow-md rounded-xl ${
+        expandedCard ? "h-auto" : "h-24"
+      }`}
+    >
+      <View className="flex-row items-center">
         <Image
           source={require("../assets/appIMG/profile1.png")}
           className="pl-2 mr-4 rounded-full w-14 h-14"
         />
-
         <View>
           <CustomText className="text-2xl">{item.name}</CustomText>
           <View className="bg-[#87B2D3] flex-row gap-x-2 rounded-xl items-center justify-center">
@@ -62,8 +96,16 @@ export default function ViewByIndividual() {
             </CustomText>
           </View>
         </View>
-
-        <View className="absolute right-2">
+        <TouchableOpacity
+          className="absolute right-16"
+          onPress={() => handleDelete(item.id)}
+        >
+          <Image source={require("../assets/appIMG/Delete.png")} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="absolute right-2"
+          onPress={() => toggleCard(item.id)}
+        >
           <Image
             source={
               expandedCard === item.id
@@ -71,8 +113,8 @@ export default function ViewByIndividual() {
                 : require("../assets/appIMG/arrowDown.png")
             }
           />
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
 
       {expandedCard === item.id && (
         <View className="p-2 mt-3 bg-[#D6E5F0] rounded-lg">
@@ -97,14 +139,10 @@ export default function ViewByIndividual() {
           )}
 
           <View className="flex-row items-center justify-center h-12 px-4 mx-3 mt-3 text-2xl bg-white rounded-lg shadow-md">
-            <CustomText className="text-xl">
-              Paid : {item.paidAmount}
-            </CustomText>
+            <CustomText className="text-xl">Paid : {item.paidAmount}</CustomText>
           </View>
           <View className="flex-row items-center justify-center h-12 px-4 mx-3 mt-3 bg-white rounded-lg shadow-md">
-            <CustomText className="text-xl">
-              Balance : {item.balance}
-            </CustomText>
+            <CustomText className="text-xl">Balance : {item.balance}</CustomText>
           </View>
         </View>
       )}
@@ -112,7 +150,7 @@ export default function ViewByIndividual() {
   );
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 h-full">
       <ImageBackground
         source={require("../assets/appIMG/viewbydateBG.png")}
         className="flex-1 p-5 pt-14"
@@ -127,12 +165,12 @@ export default function ViewByIndividual() {
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           <FlatList
-            className="pt-4"
-            data={data} // Use the fetched data
+            className="pt-4 gap-y-8"
+            data={data}
             renderItem={renderItem}
-            keyExtractor={(item) => item._id}
+            keyExtractor={(item) => item.id}
             ListHeaderComponent={
-              <CustomText className="p-1 mt-10 mb-4 text-4xl">
+              <CustomText className="p-1 mt-10 mb-4 text-4xl pb-9">
                 View by Individual
               </CustomText>
             }

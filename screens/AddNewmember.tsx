@@ -20,7 +20,6 @@ export default function AddSelection() {
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
 
-  // Function to handle adding the new member
   const handleAddMember = async () => {
     if (!name || !targetAmount) {
       Alert.alert("Error", "Name and Target Amount are required");
@@ -45,11 +44,9 @@ export default function AddSelection() {
       const data = await response.json();
 
       if (response.ok) {
-        // Show success message
         Alert.alert("Success", "Member created successfully");
         navigation.navigate("Home", { username: username });
       } else {
-        // Show error message
         Alert.alert("Error", data.error || "Failed to create member");
       }
     } catch (error) {
@@ -82,7 +79,7 @@ export default function AddSelection() {
             <CustomText className="p-1 text-2xl">Name</CustomText>
           </View>
           <TextInput
-            className="h-12 mx-3 mt-4 text-lg bg-white rounded-lg drop-shadow-2xl"
+            className="h-12 pl-5 mx-3 mt-4 text-lg bg-white rounded-lg drop-shadow-2xl"
             placeholder="Enter name"
             value={name}
             onChangeText={(text) => setName(text)}
@@ -91,7 +88,7 @@ export default function AddSelection() {
             <CustomText className="p-1 text-2xl">Target Amount</CustomText>
           </View>
           <TextInput
-            className="h-12 mx-3 mt-4 text-lg bg-white rounded-lg drop-shadow-2xl"
+            className="h-12 pl-5 mx-3 mt-4 text-lg bg-white rounded-lg drop-shadow-2xl"
             placeholder="Enter target amount"
             keyboardType="numeric"
             value={targetAmount}

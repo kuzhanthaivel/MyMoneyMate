@@ -7,16 +7,20 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import CustomText from "../components/CustomText";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Verifykey() {
   const navigation = useNavigation();
-  const [userName, setUserName] = useState("");
+  const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -33,17 +37,26 @@ export default function Verifykey() {
     fetchUsername();
   }, []);
 
+  const setLoginExpiration = async () => {
+    const expirationTime = Date.now() + 3 * 24 * 60 * 60 * 1000;
+    await AsyncStorage.setItem("LoginExpiration", JSON.stringify(expirationTime));
+    await AsyncStorage.setItem("IsLogin", JSON.stringify(true));
+    await AsyncStorage.setItem("Username", username); 
+  };
+
   const verifyUser = async () => {
+    setLoading(true);
     try {
       const response = await axios.post(
         "https://my-money-mate-server.vercel.app/verify-user",
         {
-          username: userName,
+          username: username,
           password: password,
         }
       );
       if (response.status === 200) {
-        navigation.navigate("Home", { username: userName });
+        await setLoginExpiration();
+        (navigation as any).navigate("Home", { username: username });
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -51,6 +64,8 @@ export default function Verifykey() {
       } else {
         Alert.alert("Error", "Something went wrong. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,8 +84,8 @@ export default function Verifykey() {
 
           <View className="items-center justify-center pt-56">
             <Image source={require("../assets/appIMG/profile.png")} />
-            <CustomText className="pt-8 text-5xl">
-              {userName || "Loading..."}
+            <CustomText className="pt-8 text-5xl" style={{}} >
+              {username || "Loading..."}
             </CustomText>
           </View>
 
@@ -80,11 +95,11 @@ export default function Verifykey() {
             </View>
 
             <View className="pt-8">
-              <CustomText className="p-1 text-4xl">
+              <CustomText style={{}} className="p-1 text-4xl">
                 Enter to your{" "}
-                <CustomText className="text-[#004E89]">account</CustomText>
+                <CustomText style={{}} className="text-[#004E89]">account</CustomText>
               </CustomText>
-              <CustomText className="p-1 text-4xl text-[#004E89]">
+              <CustomText style={{}} className="p-1 text-4xl text-[#004E89]">
                 Password
               </CustomText>
             </View>
@@ -116,15 +131,19 @@ export default function Verifykey() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              className="items-center pt-10 "
-              onPress={verifyUser}
-            >
-              <Image
-                className="h-16 w-60 rounded-2xl"
-                source={require("../assets/appIMG/VerifyButton.png")}
-              />
-            </TouchableOpacity>
+            {loading ? (
+              <ActivityIndicator size="large" color="#004E89" />
+            ) : (
+              <TouchableOpacity
+                className="items-center pt-10"
+                onPress={verifyUser}
+              >
+                <Image
+                  className="h-16 w-60 rounded-2xl"
+                  source={require("../assets/appIMG/VerifyButton.png")}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </ImageBackground>
       </ScrollView>

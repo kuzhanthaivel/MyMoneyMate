@@ -9,16 +9,27 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import GestureRecognizer from "react-native-swipe-gestures";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Welcome() {
   const jumpAnim = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
 
-  const onSwipe = (gestureName) => {
+  const onSwipe = async (gestureName) => {
     switch (gestureName) {
       case "SWIPE_UP":
-        console.log("Up swipe performed");
-        navigation.navigate("Verifykey");
+        const isLoggedIn = JSON.parse(await AsyncStorage.getItem("IsLogin"));
+        if (isLoggedIn) {
+          const expirationTime = JSON.parse(await AsyncStorage.getItem("LoginExpiration"));
+          if (expirationTime && Date.now() > expirationTime) {
+            await AsyncStorage.setItem("IsLogin", JSON.stringify(false));
+            (navigation as any).navigate("Verifykey");
+          } else {
+            (navigation as any).navigate("Home");
+          }
+        } else {
+          (navigation as any).navigate("Verifykey");
+        }
         break;
       default:
         console.log("Undetected action");
